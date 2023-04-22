@@ -5,46 +5,61 @@ This will be a basic chat application backend using Slim Framework 4 and Sqlite3
 
 *MODELS*
 
-User:
-- Nickname: unique
-- id: primary_key
-- Mail?
+    AuthToken:
+        - id: primary_key
+        - user: foreign key
+        - token
+        - expires_at
+    
+    User:
+        - Username: unique
+        - id: primary_key
+        - password_hash
+        - mail?
 
-Chat:
-- User1
-- User2
+    Chat:
+        - user1
+        - user2
 
-- unique together: User1, User2
+        - unique together: user1, user2
 
-Message:
-- Chat: foreign key
-- Sender: foreign key
-- Content
-- Date
-- isSeen
+    Message:
+        - id: primary_key
+        - chat: Chat foreign key
+        - sender: userforeign key
+        - content
+        - date
+        - isSeen
+        - replyTo?: Message foreign key
 
 *ENDPOINTS*
 
-register - POST - register/
-- Username
-- Password
+    register - POST - register/
+        - username
+        - password
 
-login - POST - login/
-- Username
-- Password
+        - returns ok
 
-listChats - GET - chat/
-- returns: paginated list of chats
+    login - POST - login/
+        - username
+        - password
 
-getChat - GET - chat/{username}
-- returns: paginated list of messages
+        - returns auth_token
 
-sendMessage - POST chat/{username}/message
-- message_content
+    listChats - GET - chat/
+        - Returns paginated list of chats
 
-- Returns generated message_id
+    getChat - GET - chat/{username}
+        - Returns paginated list of messages
 
-markMessageAsSeen - POST - chat/{username}/message/{id}/mark-as-seen
-- message_id
+    sendMessage - POST chat/{username}/message
+        - message_content
+        - reply_to?: message_id
 
-- Returns ok
+        - Returns generated message_id
+
+    markMessageAsSeen - POST - chat/{username}/mark-as-seen
+        - Returns ok
+
+    deleteMessage - DELETE - chat/{username}/message/{message_id}
+        - Returns ok
