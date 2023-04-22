@@ -1,2 +1,2 @@
-This will be a basic chat application backend using Slim Framework 3 and Sqlite3.
+This will be a basic chat application backend using Slim Framework 4 and Sqlite3.
 
