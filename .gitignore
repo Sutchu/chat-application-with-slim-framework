@@ -1,1 +1,4 @@
-vendor/
+/settings.php
+/var/
+!/var/.gitkeep
+/vendor/
