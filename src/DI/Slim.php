@@ -13,6 +13,7 @@ use Slim\Middleware\ContentLengthMiddleware;
 use UMA\DIC\ServiceProvider;
 use sutchu\chatserver\Action\ListUsers;
 use sutchu\chatserver\Action\RegisterUserAction;
+use sutchu\chatserver\Action\LoginUserAction;
 
 
 final class Slim implements ServiceProvider
@@ -34,6 +35,12 @@ final class Slim implements ServiceProvider
             );
         });
 
+        $c->set(LoginUserAction::class, static function(ContainerInterface $c): RequestHandlerInterface {
+            return new LoginUserAction(
+                $c->get(EntityManager::class)
+            );
+        });
+
         $c->set(App::class, static function (ContainerInterface $c): App {
             /** @var array $settings */
             $settings = $c->get('settings');
@@ -50,6 +57,7 @@ final class Slim implements ServiceProvider
 
             $app->get('/users', ListUsers::class);
             $app->post('/register', RegisterUserAction::class);
+            $app->post('/login', LoginUserAction::class);
 
             return $app;
         });

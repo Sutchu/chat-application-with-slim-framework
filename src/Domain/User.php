@@ -4,17 +4,21 @@ declare(strict_types=1);
 
 namespace sutchu\chatserver\Domain;
 
+use InvalidArgumentException;
+use JsonSerializable;
 use DateTimeImmutable;
+
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
-use JsonSerializable;
 use Doctrine\ORM\Mapping\Table;
+
+use sutchu\chatserver\Domain\AuthToken;
 
 use function password_hash;
 use function password_verify;
-use InvalidArgumentException;
+
 
 #[Entity, Table(name: 'users')]
 final class User implements JsonSerializable
@@ -74,6 +78,11 @@ final class User implements JsonSerializable
         }
 
         $this->password_hash = password_hash($new_password, PASSWORD_DEFAULT);
+    }
+
+    public function createAuthToken(int $tokenLength = 32, int $expiresInDays = 7): AuthToken
+    {
+        return new AuthToken($this, $tokenLength, $expiresInDays);
     }
 
     /**
