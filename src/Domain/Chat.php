@@ -33,23 +33,13 @@ class Chat implements JsonSerializable
 
     private function __construct(User $user1, User $user2)
     {
+        // Ensure user1 has the lower id
+        if ($user1->getId() > $user2->getId()) {
+            [$user1, $user2] = [$user2, $user1];
+        }
+
         $this->user1 = $user1;
         $this->user2 = $user2;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function getUser1(): User
-    {
-        return $this->user1;
-    }
-
-    public function getUser2(): User
-    {
-        return $this->user2;
     }
 
     public function jsonSerialize(): array
@@ -61,18 +51,23 @@ class Chat implements JsonSerializable
         ];
     }
 
-    public static function getOrCreateChat(EntityManager $em, User $user1, User $user2): ?Chat
+    public static function getChat(EntityManager $em, User $user1, User $user2): ?Chat
     {
         // Ensure user1 has the lower id
         if ($user1->getId() > $user2->getId()) {
             [$user1, $user2] = [$user2, $user1];
         }
 
-        $chat = $em->getRepository(Chat::class)
+        return $em->getRepository(Chat::class)
             ->findOneBy([
                 'user1' => $user1,
                 'user2' => $user2,
             ]);
+    }
+
+    public static function getOrCreateChat(EntityManager $em, User $user1, User $user2): ?Chat
+    {
+        $chat = Chat::getChat($em, $user1, $user2);
 
         // If no chat was found, create a new one
         if ($chat === null) {

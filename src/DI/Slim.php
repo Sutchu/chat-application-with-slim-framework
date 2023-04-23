@@ -16,6 +16,7 @@ use sutchu\chatserver\Action\ListUsers;
 use sutchu\chatserver\Action\RegisterUserAction;
 use sutchu\chatserver\Action\LoginUserAction;
 use sutchu\chatserver\Action\SendMessageAction;
+use sutchu\chatserver\Action\GetChatAction;
 
 use sutchu\chatserver\Middleware\AuthorizationMiddleware;
 
@@ -51,6 +52,12 @@ final class Slim implements ServiceProvider
             );
         });
 
+        $c->set(GetChatAction::class, static function(ContainerInterface $c): RequestHandlerInterface {
+            return new GetChatAction(
+                $c->get(EntityManager::class)
+            );
+        });
+
         $c->set(AuthorizationMiddleware::class, static function (ContainerInterface $c): AuthorizationMiddleware {
             return new AuthorizationMiddleware(
                 $c->get(EntityManager::class)
@@ -75,6 +82,9 @@ final class Slim implements ServiceProvider
             $app->post('/register', RegisterUserAction::class);
             $app->post('/login', LoginUserAction::class);
             $app->post('/chat/{username}/message', SendMessageAction::class)
+                ->addMiddleware($c->get(AuthorizationMiddleware::class));
+
+            $app->get('/chat/{username}', GetChatAction::class)
                 ->addMiddleware($c->get(AuthorizationMiddleware::class));
 
             return $app;
