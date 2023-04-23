@@ -13,6 +13,7 @@ use Doctrine\ORM\EntityManager;
 
 use Slim\Psr7\Response;
 
+
 class AuthorizationMiddleware implements MiddlewareInterface
 {
     private EntityManager $em;

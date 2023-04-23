@@ -67,8 +67,6 @@ class AuthToken implements JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'id' => $this->getId(),
-            'user' => $this->getUser(),
             'token' => $this->getToken(),
             'expires_at' => $this->getExpiresAt()->format(DateTimeInterface::ATOM)
         ];

@@ -98,7 +98,6 @@ class Message implements JsonSerializable
     {
         return [
             'id' => $this->id,
-            'chat' => $this->chat,
             'sender' => $this->sender,
             'content' => $this->content,
             'created_at' => $this->created_at,
