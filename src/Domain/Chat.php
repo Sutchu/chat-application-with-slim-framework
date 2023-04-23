@@ -12,8 +12,10 @@ use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\Table;
 use Doctrine\ORM\Mapping\UniqueConstraint;
+use Doctrine\ORM\EntityManager;
 
 use JsonSerializable;
+
 
 #[Entity, Table(name: 'chats', uniqueConstraints: [new UniqueConstraint(name: 'unique_users_chat', columns: ['user1_id', 'user2_id'])])]
 class Chat implements JsonSerializable
@@ -31,6 +33,11 @@ class Chat implements JsonSerializable
 
     public function __construct(User $user1, User $user2)
     {
+        // Ensure user1 has the lower id
+        if ($user1->getId() > $user2->getId()) {
+            [$user1, $user2] = [$user2, $user1];
+        }
+
         $this->user1 = $user1;
         $this->user2 = $user2;
     }
@@ -57,5 +64,28 @@ class Chat implements JsonSerializable
             'user1' => $this->user1,
             'user2' => $this->user2,
         ];
+    }
+
+    public static function getOrCreateChat(EntityManager $em, User $user1, User $user2): ?Chat
+    {
+        // Ensure user1 has the lower id
+        if ($user1->getId() > $user2->getId()) {
+            [$user1, $user2] = [$user2, $user1];
+        }
+
+        $chat = $em->getRepository(Chat::class)
+            ->findOneBy([
+                'user1' => $user1,
+                'user2' => $user2,
+            ]);
+
+        // If no chat was found, create a new one
+        if ($chat === null) {
+            $chat = new Chat($user1, $user2);
+            $em->persist($chat);
+            $em->flush();
+        }
+
+        return $chat;
     }
 }
