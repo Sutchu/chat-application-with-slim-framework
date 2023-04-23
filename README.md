@@ -4,6 +4,7 @@ This will be a basic chat application backend using Slim Framework 4 and Sqlite3
 **Initial Plan for models and actions**
 
 *MODELS*
+
     AuthToken:
         - id: primary_key
         - user: foreign key
@@ -11,13 +12,15 @@ This will be a basic chat application backend using Slim Framework 4 and Sqlite3
         - expires_at
     
     User:
-        - username: unique
-        - re
         - id: primary_key
+        - username: unique
+        - email
+        - created_at
         - password_hash
-        - mail?
+
 
     Chat:
+        - id: primary_key
         - user1
         - user2
 
@@ -28,11 +31,12 @@ This will be a basic chat application backend using Slim Framework 4 and Sqlite3
         - chat: Chat foreign key
         - sender: userforeign key
         - content
-        - date
-        - isSeen
-        - replyTo?: Message foreign key
+        - created_at
+        - is_seen
+        - reply_to?: Message foreign key
 
 *ENDPOINTS*
+
     register - POST - register/
         - username
         - password

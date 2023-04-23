@@ -29,8 +29,8 @@ final class User implements JsonSerializable
     #[Column(type: 'string', unique: true, nullable: false)]
     private string $email;
 
-    #[Column(name: 'registered_at', type: 'datetimetz_immutable', nullable: false)]
-    private DateTimeImmutable $registered_at;
+    #[Column(name: 'created_at', type: 'datetimetz_immutable', nullable: false)]
+    private DateTimeImmutable $created_at;
 
     #[Column(type: 'string', unique:true, nullable: false, length: 16)]
     private string $username;
@@ -41,7 +41,7 @@ final class User implements JsonSerializable
     public function __construct(string $email, string $username, string $password)
     {
         $this->email = $email;
-        $this->registered_at = new DateTimeImmutable('now');
+        $this->created_at = new DateTimeImmutable('now');
         $this->username = $username;
         $this->password_hash = password_hash($password, PASSWORD_DEFAULT);
     }
@@ -58,7 +58,7 @@ final class User implements JsonSerializable
 
     public function getregisteredAt(): DateTimeImmutable
     {
-        return $this->registered_at;
+        return $this->created_at;
     }
 
     public function getUsername(): string
