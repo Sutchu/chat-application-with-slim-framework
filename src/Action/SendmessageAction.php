@@ -10,8 +10,10 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use sutchu\chatserver\Domain\Chat;
 use sutchu\chatserver\Domain\Message;
+use sutchu\chatserver\Domain\User;
 
 use slim\Psr7\Response;
+use Slim\Routing\RouteContext;
 
 
 use function json_encode;
@@ -29,7 +31,10 @@ final class SendMessageAction implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $sender_user = $request->getAttribute('user');
-        $receiver_user_username = $request->getAttribute('username');
+        $routeContext = RouteContext::fromRequest($request);
+        $route = $routeContext->getRoute();
+        
+        $receiver_user_username = $route->getArgument('username');
 
         $receiver_user = $this->em->getRepository(User::class)->findOneBy([
             'username' => $receiver_user_username,

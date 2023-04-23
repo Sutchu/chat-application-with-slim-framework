@@ -21,7 +21,7 @@ use function password_verify;
 
 
 #[Entity, Table(name: 'users')]
-final class User implements JsonSerializable
+class User implements JsonSerializable
 {
     #[Id, Column(type: 'integer'), GeneratedValue(strategy: 'AUTO')]
     private int $id;

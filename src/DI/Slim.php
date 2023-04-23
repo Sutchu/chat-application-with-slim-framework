@@ -45,6 +45,18 @@ final class Slim implements ServiceProvider
             );
         });
 
+        $c->set(SendMessageAction::class, static function(ContainerInterface $c): RequestHandlerInterface {
+            return new SendMessageAction(
+                $c->get(EntityManager::class)
+            );
+        });
+
+        $c->set(AuthorizationMiddleware::class, static function (ContainerInterface $c): AuthorizationMiddleware {
+            return new AuthorizationMiddleware(
+                $c->get(EntityManager::class)
+            );
+        });
+
         $c->set(App::class, static function (ContainerInterface $c): App {
             /** @var array $settings */
             $settings = $c->get('settings');
@@ -57,7 +69,7 @@ final class Slim implements ServiceProvider
                 $settings['slim']['logErrorDetails']
             );
 
-            $app->add(new ContentLengthMiddleware());
+            // $app->add(new ContentLengthMiddleware());
 
             $app->get('/users', ListUsers::class);
             $app->post('/register', RegisterUserAction::class);

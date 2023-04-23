@@ -31,13 +31,8 @@ class Chat implements JsonSerializable
     #[JoinColumn(name: 'user2_id', referencedColumnName: 'id', nullable: false)]
     private User $user2;
 
-    public function __construct(User $user1, User $user2)
+    private function __construct(User $user1, User $user2)
     {
-        // Ensure user1 has the lower id
-        if ($user1->getId() > $user2->getId()) {
-            [$user1, $user2] = [$user2, $user1];
-        }
-
         $this->user1 = $user1;
         $this->user2 = $user2;
     }
