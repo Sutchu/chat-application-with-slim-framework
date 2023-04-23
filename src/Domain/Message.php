@@ -12,8 +12,10 @@ use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\Table;
+use Doctrine\ORM\EntityManager;
 
 use JsonSerializable;
+
 
 #[Entity, Table(name: 'messages')]
 class Message implements JsonSerializable
@@ -38,7 +40,7 @@ class Message implements JsonSerializable
     #[Column(type: 'boolean', nullable: false)]
     private bool $is_seen;
 
-    #[ManyToOne(targetEntity: self::class, nullable: true)]
+    #[ManyToOne(targetEntity: self::class)]
     #[JoinColumn(name: 'reply_to_id', referencedColumnName: 'id', nullable: true)]
     private ?Message $reply_to;
 
@@ -57,7 +59,6 @@ class Message implements JsonSerializable
         $this->reply_to = $reply_to;
     }
 
-    // Add your getters and setters here
     public function getId(): int
     {
         return $this->id;

@@ -36,7 +36,7 @@ class AuthToken implements JsonSerializable
     {
         $this->user = $user;
         $this->token = bin2hex(random_bytes($tokenLength));
-        $this->expires_at = (new DateTimeImmutable())->modify("+$expiresInDays days");
+        $this->expires_at = (new DateTimeImmutable("now"))->modify("+$expiresInDays days");
     }
 
     public function getId(): int
@@ -57,6 +57,11 @@ class AuthToken implements JsonSerializable
     public function getExpiresAt(): DateTimeInterface
     {
         return $this->expires_at;
+    }
+
+    public function isValid(): bool
+    {
+        return $this->expires_at > new DateTimeImmutable("now");
     }
 
     public function jsonSerialize(): array

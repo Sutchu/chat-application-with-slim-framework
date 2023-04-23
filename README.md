@@ -18,7 +18,6 @@ This will be a basic chat application backend using Slim Framework 4 and Sqlite3
         - created_at
         - password_hash
 
-
     Chat:
         - id: primary_key
         - user1

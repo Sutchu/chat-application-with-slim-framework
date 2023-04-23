@@ -11,9 +11,13 @@ use Slim\App;
 use Slim\Factory\AppFactory;
 use Slim\Middleware\ContentLengthMiddleware;
 use UMA\DIC\ServiceProvider;
+
 use sutchu\chatserver\Action\ListUsers;
 use sutchu\chatserver\Action\RegisterUserAction;
 use sutchu\chatserver\Action\LoginUserAction;
+use sutchu\chatserver\Action\SendMessageAction;
+
+use sutchu\chatserver\Middleware\AuthorizationMiddleware;
 
 
 final class Slim implements ServiceProvider
@@ -58,6 +62,8 @@ final class Slim implements ServiceProvider
             $app->get('/users', ListUsers::class);
             $app->post('/register', RegisterUserAction::class);
             $app->post('/login', LoginUserAction::class);
+            $app->post('/chat/{username}/message', SendMessageAction::class)
+                ->addMiddleware($c->get(AuthorizationMiddleware::class));
 
             return $app;
         });
