@@ -9,6 +9,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use sutchu\chatserver\Domain\AuthToken;
+use sutchu\chatserver\Util\ResponseUtil;
+
 use Doctrine\ORM\EntityManager;
 
 use Slim\Psr7\Response;
@@ -28,25 +30,19 @@ class AuthorizationMiddleware implements MiddlewareInterface
         $authHeader = $request->getHeaderLine('Authorization');
 
         if (!$authHeader) {
-            $response = new Response(401);
-            $response->getBody()->write('Unauthorized: Missing Authorization header');
-            return $response;
+            return ResponseUtil::errorResponse(401, 'Unauthorized: Missing Authorization header');
         }
 
         $token = substr($authHeader, 7); // Remove "Bearer " prefix in the Authorization header
 
         if (!$token) {
-            $response = new Response(401);
-            $response->getBody()->write('Unauthorized: Missing token');
-            return $response;
+            return ResponseUtil::errorResponse(401, 'Unauthorized: Missing token');
         }
 
         $authToken = $this->em->getRepository(AuthToken::class)->findOneBy(['token' => $token]);
 
         if (!$authToken || !$authToken->isValid()) {
-            $response = new Response(401);
-            $response->getBody()->write('Unauthorized: Invalid token');
-            return $response;
+            return ResponseUtil::errorResponse(401, 'Unauthorized: Invalid token');
         }
 
         // Add the user object to the request's attributes for actions to use

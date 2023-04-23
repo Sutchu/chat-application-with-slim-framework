@@ -10,6 +10,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Slim\App;
 use Slim\Factory\AppFactory;
 use Slim\Middleware\ContentLengthMiddleware;
+use Slim\Routing\RouteCollectorProxy;
 use UMA\DIC\ServiceProvider;
 
 use sutchu\chatserver\Action\ListUsers;
@@ -18,6 +19,7 @@ use sutchu\chatserver\Action\LoginUserAction;
 use sutchu\chatserver\Action\SendMessageAction;
 use sutchu\chatserver\Action\GetChatAction;
 use sutchu\chatserver\Action\ListChatsAction;
+
 
 use sutchu\chatserver\Middleware\AuthorizationMiddleware;
 
@@ -28,6 +30,13 @@ final class Slim implements ServiceProvider
      * {@inheritdoc}
      */
     public function provide(ContainerInterface $c): void
+    {
+        $this->registerActions($c);
+        $this->registerMiddleware($c);
+        $this->registerApp($c);
+    }
+    
+    private function registerActions(ContainerInterface $c): void
     {
         $c->set(ListUsers::class, static function(ContainerInterface $c): RequestHandlerInterface {
             return new ListUsers(
@@ -64,6 +73,10 @@ final class Slim implements ServiceProvider
                 $c->get(EntityManager::class)
             );
         });
+    }
+
+    private function registerMiddleware(ContainerInterface $c): void
+    {
 
         $c->set(AuthorizationMiddleware::class, static function (ContainerInterface $c): AuthorizationMiddleware {
             return new AuthorizationMiddleware(
@@ -71,6 +84,10 @@ final class Slim implements ServiceProvider
             );
         });
 
+    }
+
+    private function registerApp(ContainerInterface $c): void
+    {
         $c->set(App::class, static function (ContainerInterface $c): App {
             /** @var array $settings */
             $settings = $c->get('settings');
@@ -88,12 +105,12 @@ final class Slim implements ServiceProvider
             $app->get('/users', ListUsers::class);
             $app->post('/register', RegisterUserAction::class);
             $app->post('/login', LoginUserAction::class);
-            $app->post('/chat/{username}/message', SendMessageAction::class)
-                ->addMiddleware($c->get(AuthorizationMiddleware::class));
-            $app->get('/chat/{username}', GetChatAction::class)
-                ->addMiddleware($c->get(AuthorizationMiddleware::class));
-            $app->get('/chat', ListChatsAction::class)
-                ->addMiddleware($c->get(AuthorizationMiddleware::class));
+
+            $app->group('/chat', function (RouteCollectorProxy $group) {
+                $group->post('/{username}/message', SendMessageAction::class);
+                $group->get('/{username}', GetChatAction::class);
+                $group->get('', ListChatsAction::class);
+            })->addMiddleware($c->get(AuthorizationMiddleware::class));
 
             return $app;
         });
